@@ -53,4 +53,17 @@ class ResearcherAgent(BaseAgent):
         state.research_notes = summary_resp.content
         state.add_trace_event("research_completed", {"sources_count": len(all_sources)})
         
+        from multi_agent_research_lab.core.schemas import AgentName, AgentResult
+        state.agent_results.append(
+            AgentResult(
+                agent=AgentName.RESEARCHER,
+                content=summary_resp.content,
+                metadata={
+                    "cost_usd": (search_queries_resp.cost_usd or 0.0) + (summary_resp.cost_usd or 0.0),
+                    "input_tokens": (search_queries_resp.input_tokens or 0) + (summary_resp.input_tokens or 0),
+                    "output_tokens": (search_queries_resp.output_tokens or 0) + (summary_resp.output_tokens or 0)
+                }
+            )
+        )
+        
         return state

@@ -20,15 +20,18 @@ def run_benchmark(run_name: str, query: str, runner: Runner) -> tuple[ResearchSt
     # Calculate total cost from trace or agent_results if available
     # For simplicity, we can extract it from the state if we added it there,
     # but here we'll just sum up what we can find.
-    total_cost = 0.0
-    # In my implementation, I didn't store cost in the state directly yet, 
-    # but the trace has info. Let's assume we want to sum costs.
-    # For now, I'll just use the latency and add a note.
+    total_cost = sum(r.metadata.get("cost_usd", 0.0) for r in state.agent_results)
+    total_in = sum(r.metadata.get("input_tokens", 0) for r in state.agent_results)
+    total_out = sum(r.metadata.get("output_tokens", 0) for r in state.agent_results)
     
     metrics = BenchmarkMetrics(
         run_name=run_name, 
         latency_seconds=latency,
-        estimated_cost_usd=None, # Will implement if we track cost in state
-        notes=f"Iteration count: {state.iteration}"
+        estimated_cost_usd=total_cost,
+        input_tokens=total_in,
+        output_tokens=total_out,
+        sources_count=len(state.sources),
+        final_answer=state.final_answer,
+        notes=f"Iterations: {state.iteration}"
     )
     return state, metrics

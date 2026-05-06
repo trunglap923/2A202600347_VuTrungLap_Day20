@@ -41,7 +41,11 @@ class WriterAgent(BaseAgent):
             AgentResult(
                 agent=AgentName.WRITER,
                 content=response.content,
-                metadata={"cost_usd": response.cost_usd or 0.0}
+                metadata={
+                    "cost_usd": response.cost_usd or 0.0,
+                    "input_tokens": response.input_tokens or 0,
+                    "output_tokens": response.output_tokens or 0
+                }
             )
         )
         

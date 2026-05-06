@@ -154,3 +154,32 @@ Học viên nộp:
 - LangGraph concepts — https://langchain-ai.github.io/langgraph/concepts/
 - LangSmith tracing — https://docs.smith.langchain.com/
 - Langfuse tracing — https://langfuse.com/docs
+
+## Lab Submission (Phần Nộp Bài)
+
+### 1. LangSmith Trace
+![LangSmith Trace](photo/image.png)
+
+### 2. Failure Mode Analysis (Phân tích lỗi)
+
+**Hiện tượng (Failure Mode):**
+Khi chạy Multi-Agent, hệ thống trả về kết quả ảo giác (hallucinations) với các tài liệu tham khảo không có thật. Kiểm tra log thấy `sources_count: 0` (Agent không tìm thấy nguồn nào từ Internet).
+
+**Nguyên nhân gốc rễ:**
+1. **Lỗi logic của ResearcherAgent:** Thay vì yêu cầu LLM sinh ra các "từ khóa tìm kiếm ngắn", prompt bị truyền sai khiến LLM sinh ra cả một đoạn văn dài 100 chữ. Sau đó Agent lấy đoạn văn này đưa vào DuckDuckGo làm từ khóa, dẫn đến việc không tìm ra kết quả.
+2. **Lỗi thư viện:** Thư viện `duckduckgo_search` cũ bị hỏng API nên nó lẳng lặng trả về mảng rỗng `[]` thay vì báo lỗi.
+
+**Cách khắc phục (Fix):**
+1. Cập nhật lại thư viện thành phiên bản mới nhất (`pip install -U ddgs`).
+2. Sửa lại mã nguồn trong `ResearcherAgent`: Truyền đúng `search_query_prompt` vào biến `system_prompt` của LLM và xử lý lstrip() để cắt bỏ các số thứ tự.
+Kết quả: Hệ thống đã tìm kiếm chính xác và cung cấp hàng loạt URL liên quan để Writer tổng hợp nội dung thực tế.
+
+### 3. Exit Ticket
+
+**1. Case nào nên dùng multi-agent? Vì sao?**
+Nên dùng khi bài toán có độ phức tạp cao, đòi hỏi nhiều bước xử lý chuyên biệt (ví dụ: Nghiên cứu -> Phân tích -> Viết bài -> Phản biện).
+*Vì sao:* Việc chia nhỏ giúp mỗi Agent tập trung vào một task với prompt cụ thể, giảm thiểu rủi ro LLM bị "quá tải ngữ cảnh" (context stuffing) hoặc "ảo giác" (hallucination). Ngoài ra, có agent Critic giúp kiểm định chéo (cross-validation) chất lượng đầu ra.
+
+**2. Case nào không nên dùng multi-agent? Vì sao?**
+Không nên dùng cho các bài toán quá đơn giản (VD: tra cứu nhanh, dịch thuật ngắn) hoặc các hệ thống đòi hỏi độ trễ cực thấp (Real-time).
+*Vì sao:* Multi-Agent tiêu tốn rất nhiều thời gian (Latency cao do phải chờ tuần tự qua nhiều node) và chi phí (Cost đội lên do gọi API nhiều lần).

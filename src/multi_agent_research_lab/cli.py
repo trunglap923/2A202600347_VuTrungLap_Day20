@@ -120,6 +120,17 @@ def benchmark(
         state = ResearchState(request=ResearchQuery(query=q))
         resp = client.complete("You are a research assistant.", q)
         state.final_answer = resp.content
+        state.agent_results.append(
+            AgentResult(
+                agent=AgentName.WRITER, 
+                content=resp.content, 
+                metadata={
+                    "cost_usd": resp.cost_usd or 0.0,
+                    "input_tokens": resp.input_tokens or 0,
+                    "output_tokens": resp.output_tokens or 0
+                }
+            )
+        )
         return state
 
     _, b_metrics = run_benchmark("Baseline", query, baseline_runner)
