@@ -30,7 +30,8 @@ class LLMClient:
         self.settings = get_settings()
         if not self.settings.openai_api_key:
             raise LLMClientError("OPENAI_API_KEY is not set in settings")
-        self.client = OpenAI(api_key=self.settings.openai_api_key)
+        from langsmith import wrappers
+        self.client = wrappers.wrap_openai(OpenAI(api_key=self.settings.openai_api_key))
 
     def complete(self, system_prompt: str, user_prompt: str) -> LLMResponse:
         """Return a model completion.

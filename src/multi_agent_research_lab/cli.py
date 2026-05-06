@@ -18,6 +18,9 @@ console = Console()
 
 
 def _init() -> None:
+    from dotenv import load_dotenv
+    load_dotenv()
+    
     settings = get_settings()
     configure_logging(settings.log_level)
 
