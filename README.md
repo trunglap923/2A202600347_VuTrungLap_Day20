@@ -58,8 +58,8 @@ Trace + Benchmark Report
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -e "[dev]"
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -e ".[dev,llm]"
 cp .env.example .env
 ```
 
@@ -101,14 +101,14 @@ Mặc định lệnh sẽ báo các `TODO` cần làm. Đây là chủ đích c�
 
 ## Milestones trong 2 giờ lab
 
-| Thời lượng | Milestone | File gợi ý |
-|---:|---|---|
-| 0-15' | Setup, chạy baseline skeleton | `cli.py`, `services/llm_client.py` |
-| 15-45' | Build Supervisor / router | `agents/supervisor.py`, `graph/workflow.py` |
-| 45-75' | Thêm Researcher, Analyst, Writer | `agents/*.py`, `core/state.py` |
-| 75-95' | Trace + benchmark single vs multi | `observability/tracing.py`, `evaluation/benchmark.py` |
-| 95-115' | Peer review theo rubric | `docs/peer_review_rubric.md` |
-| 115-120' | Exit ticket | `docs/lab_guide.md` |
+| Thời lượng | Milestone                         | File gợi ý                                            |
+| ---------: | --------------------------------- | ----------------------------------------------------- |
+|      0-15' | Setup, chạy baseline skeleton     | `cli.py`, `services/llm_client.py`                    |
+|     15-45' | Build Supervisor / router         | `agents/supervisor.py`, `graph/workflow.py`           |
+|     45-75' | Thêm Researcher, Analyst, Writer  | `agents/*.py`, `core/state.py`                        |
+|     75-95' | Trace + benchmark single vs multi | `observability/tracing.py`, `evaluation/benchmark.py` |
+|    95-115' | Peer review theo rubric           | `docs/peer_review_rubric.md`                          |
+|   115-120' | Exit ticket                       | `docs/lab_guide.md`                                   |
 
 ## Quy ước production trong repo
 

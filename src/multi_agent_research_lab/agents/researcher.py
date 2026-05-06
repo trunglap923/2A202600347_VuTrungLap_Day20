@@ -24,12 +24,12 @@ class ResearcherAgent(BaseAgent):
         # 1. Generate search queries based on the main query
         search_query_prompt = (
             "Given the user query, generate 3 effective search queries to gather comprehensive information. "
-            "Respond with only the queries, one per line."
+            "Respond with only the queries, one per line, with no bullet points or numbering."
         )
         search_queries_resp = self.llm.complete(
-            "You are a research expert.", f"User Query: {state.request.query}"
+            search_query_prompt, f"User Query: {state.request.query}"
         )
-        search_queries = [q.strip() for q in search_queries_resp.content.split("\n") if q.strip()]
+        search_queries = [q.strip().lstrip('1234567890.-* ') for q in search_queries_resp.content.split("\n") if q.strip()][:3]
 
         # 2. Execute search
         all_sources = []

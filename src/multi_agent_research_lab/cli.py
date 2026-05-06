@@ -92,6 +92,14 @@ def multi_agent(
     import json
     console.print(json.dumps(result.trace, indent=2, ensure_ascii=False))
 
+    # Print sources researched
+    console.print("\n[bold green]Sources Researched:[/bold green]")
+    if result.sources:
+        for i, source in enumerate(result.sources, 1):
+            console.print(f"  {i}. {source.title} ({source.url})")
+    else:
+        console.print("  [italic red]No sources found.[/italic red]")
+
 
 @app.command()
 def benchmark(

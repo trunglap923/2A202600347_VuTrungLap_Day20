@@ -4,7 +4,7 @@ from multi_agent_research_lab.core.errors import StudentTodoError
 from multi_agent_research_lab.core.schemas import SourceDocument
 
 
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 
 from multi_agent_research_lab.core.errors import SearchClientError
