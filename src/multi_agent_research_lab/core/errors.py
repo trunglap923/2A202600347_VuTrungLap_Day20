@@ -15,3 +15,11 @@ class AgentExecutionError(LabError):
 
 class ValidationError(LabError):
     """Raised when state or output validation fails."""
+
+
+class LLMClientError(LabError):
+    """Raised when LLM provider returns an error (rate limit, auth, etc.)."""
+
+
+class SearchClientError(LabError):
+    """Raised when search provider fails."""

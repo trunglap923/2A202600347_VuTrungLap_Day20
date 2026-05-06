@@ -5,15 +5,52 @@ from multi_agent_research_lab.core.errors import StudentTodoError
 from multi_agent_research_lab.core.state import ResearchState
 
 
+from multi_agent_research_lab.services.llm_client import LLMClient
+from multi_agent_research_lab.services.search_client import SearchClient
+
+
 class ResearcherAgent(BaseAgent):
     """Collects sources and creates concise research notes."""
 
     name = "researcher"
 
+    def __init__(self) -> None:
+        self.llm = LLMClient()
+        self.search_client = SearchClient()
+
     def run(self, state: ResearchState) -> ResearchState:
-        """Populate `state.sources` and `state.research_notes`.
+        """Populate `state.sources` and `state.research_notes`."""
 
-        TODO(student): Implement search, source filtering, citation capture, and notes.
-        """
+        # 1. Generate search queries based on the main query
+        search_query_prompt = (
+            "Given the user query, generate 3 effective search queries to gather comprehensive information. "
+            "Respond with only the queries, one per line."
+        )
+        search_queries_resp = self.llm.complete(
+            "You are a research expert.", f"User Query: {state.request.query}"
+        )
+        search_queries = [q.strip() for q in search_queries_resp.content.split("\n") if q.strip()]
 
-        raise StudentTodoError("TODO(student): implement ResearcherAgent.run")
+        # 2. Execute search
+        all_sources = []
+        for q in search_queries[:3]:
+            sources = self.search_client.search(q, max_results=state.request.max_sources)
+            all_sources.extend(sources)
+
+        state.sources = all_sources
+
+        # 3. Summarize sources into research notes
+        sources_text = "\n\n".join(
+            [f"Source: {s.title} ({s.url})\nContent: {s.snippet}" for s in all_sources]
+        )
+        summary_prompt = (
+            "Summarize the following search results into concise research notes. "
+            "Focus on facts, key entities, and data relevant to the user query. "
+            "Use bullet points."
+        )
+        summary_resp = self.llm.complete(summary_prompt, f"Query: {state.request.query}\n\nSources:\n{sources_text}")
+        
+        state.research_notes = summary_resp.content
+        state.add_trace_event("research_completed", {"sources_count": len(all_sources)})
+        
+        return state
